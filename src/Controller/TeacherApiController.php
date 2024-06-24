@@ -4,7 +4,6 @@ namespace App\Controller; // directory structure
 
 use App\Model\Teacher;
 use App\Repository\TeacherRepository;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController; // import class to route
 use Symfony\Component\HttpFoundation\Response; // import class to response the user
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,7 +22,7 @@ class TeacherApiController extends AbstractController // same as file name
     public function getAll(TeacherRepository $repository): Response // what it returns
     {
         // dd($logger);
-        //$logger->info('before build objects line');
+        // $logger->info('before build objects line');
         // array type
         // $teachers = [
         //     [
@@ -68,7 +67,7 @@ class TeacherApiController extends AbstractController // same as file name
         return $this->json($teachers);
     }
 
-    #[Route('/{id<\d+>}', methods: ['GET'])] //regex to control only digit input
+    #[Route('/{id<\d+>}', methods: ['GET'])] // regex to control only digit input
     public function get(int $id, TeacherRepository $repository): Response
     {
         // dd($id);
