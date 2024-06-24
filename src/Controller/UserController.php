@@ -42,7 +42,7 @@ class UserController extends AbstractController
         $user = $repository->find($id);
 
         if (!$user) {
-            throw $this->createNotFoundException('User not found');
+            return $this->json(['message' => 'User not found.'],Response::HTTP_NOT_FOUND);
         }
         return $this->json($user,Response::HTTP_OK);
     }
@@ -53,7 +53,7 @@ class UserController extends AbstractController
         $user = $repository->find($id);
 
         if (!$user) {
-            throw $this->createNotFoundException('User not found');
+            return $this->json(['message' => 'User not found.'],Response::HTTP_NOT_FOUND);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -72,7 +72,7 @@ class UserController extends AbstractController
         $user = $repository->find($id);
 
         if (!$user) {
-            throw $this->createNotFoundException('User not found');
+            return $this->json(['message' => 'User not found.'],Response::HTTP_NOT_FOUND);
         }
         $entityManager->remove($user);
         $entityManager->flush();
