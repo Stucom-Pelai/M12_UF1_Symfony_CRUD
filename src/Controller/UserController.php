@@ -9,73 +9,74 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/user')]
 class UserController extends AbstractController
 {
     #[Route('/', name: 'app_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    public function index(UserRepository $userRepository): JsonResponse
     {
-        return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
-        ]);
+        return $this->json($userRepository->findAll(),Response::HTTP_OK);
     }
 
-    #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new', name: 'app_user_new', methods: ['POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        $data = json_decode($request->getContent(), true);
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
+        $user->setName($data['name']);
+        $user->setPassword($data['password']);
+        $user->setEmail($data['email']);
+        
+        $entityManager->persist($user);
+        $entityManager->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('user/new.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
+        return $this->json(['message' => 'User added successfully.'],Response::HTTP_CREATED);
     }
 
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(User $user): Response
+    public function show(int $id, UserRepository $repository): JsonResponse
     {
-        return $this->render('user/show.html.twig', [
-            'user' => $user,
-        ]);
+        $user = $repository->find($id);
+
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+        return $this->json($user,Response::HTTP_OK);
     }
 
-    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['PUT'])]
+    public function edit(Request $request, int $id, UserRepository $repository, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
+        $user = $repository->find($id);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
         }
 
-        return $this->render('user/edit.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
+        $data = json_decode($request->getContent(), true);
+
+        $user->setName($data['name']);
+        $user->setPassword($data['password']);
+        $user->setEmail($data['email']);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'User updated successfully.'],Response::HTTP_OK);
     }
 
-    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_user_delete', methods: ['DELETE'])]
+    public function delete(int $id, UserRepository $repository, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($user);
-            $entityManager->flush();
-        }
+        $user = $repository->find($id);
 
-        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'User deleted successfully.'],Response::HTTP_OK);
     }
 }
