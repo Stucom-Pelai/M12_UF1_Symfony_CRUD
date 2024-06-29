@@ -21,7 +21,6 @@ class Shop
     /**
      * @var Collection<int, Client>
      */
-    #[ORM\ManyToMany(targetEntity: Client::class, inversedBy: 'shops')]
     private Collection $clients;
 
     public function __construct()
@@ -56,6 +55,9 @@ class Shop
 
     public function addClient(Client $client): static
     {
+       
+        $this->clients = new ArrayCollection();
+
         if (!$this->clients->contains($client)) {
             $this->clients->add($client);
         }
