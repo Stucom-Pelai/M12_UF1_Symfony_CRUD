@@ -19,9 +19,12 @@ class Product
     #[ORM\Column]
     private ?int $price = null;
 
-    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Shipment $shipment = null;
 
     public function getId(): ?int
     {
@@ -60,6 +63,18 @@ class Product
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getShipment(): ?Shipment
+    {
+        return $this->shipment;
+    }
+
+    public function setShipment(?Shipment $Shipment): static
+    {
+        $this->shipment = $Shipment;
 
         return $this;
     }

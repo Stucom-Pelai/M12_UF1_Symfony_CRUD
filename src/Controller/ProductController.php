@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\Shipment;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -94,5 +95,23 @@ class ProductController extends AbstractController
         $entityManager->flush();
 
         return $this->json(['message' => 'Product deleted successfully.'],Response::HTTP_OK);
+    }
+
+    #[Route('/{id}/ship', name: 'app_product_ship', methods: ['PUT'])]
+    public function ship(Request $request, int $id, ProductRepository $repository,  EntityManagerInterface $entityManager): JsonResponse
+    {
+        $product = $repository->find($id);
+
+        if (!$product) {
+            return $this->json(['message' => 'Product not found.'], Response::HTTP_NOT_FOUND);
+        }
+        
+        $shipment = new Shipment();
+        $shipment->setDate(new \DateTime());
+        $product->setShipment($shipment);
+
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Product shipped successfully.'], Response::HTTP_OK);
     }
 }
