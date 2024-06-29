@@ -78,8 +78,8 @@ class ClientController extends AbstractController
         return $this->json(['message' => 'Client deleted successfully.'],Response::HTTP_OK);
     }
 
-    #[Route('/{id}/shop', name: 'app_client_edit_shop', methods: ['PUT'])]
-    public function editShop(Request $request, int $id, ClientRepository $repository, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/{id}/shop', name: 'app_client_add_shop', methods: ['POST'])]
+    public function addShop(Request $request, int $id, ClientRepository $repository, EntityManagerInterface $entityManager): JsonResponse
     {
         $client = $repository->find($id);
 
@@ -100,5 +100,29 @@ class ClientController extends AbstractController
         $entityManager->flush();
 
         return $this->json(['message' => 'Shop added to Client successfully.'], Response::HTTP_OK);
+    }
+
+    #[Route('/{id}/shop', name: 'app_client_delete_shop', methods: ['DELETE'])]
+    public function deleteShop(Request $request, int $id, ClientRepository $repository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $client = $repository->find($id);
+
+        if (!$client) {
+            return $this->json(['message' => 'Client not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = json_decode($request->getContent(), true);   
+
+        // find shop by ID
+        $shop = $entityManager->getRepository(Shop::class)->find($data['shop']);
+        if (!$shop) {
+            return $this->json(['message' => 'Shop not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $client->getShops()->removeElement($shop);
+
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Shop removed from Client successfully.'], Response::HTTP_OK);
     }
 }
