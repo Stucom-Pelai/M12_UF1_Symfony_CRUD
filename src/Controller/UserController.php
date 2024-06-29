@@ -48,7 +48,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['PUT'])]
-    public function edit(Request $request, int $id, UserRepository $repository, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, int $id, UserRepository $repository, EntityManagerInterface $entityManager): JsonResponse
     {
         $user = $repository->find($id);
 
@@ -67,7 +67,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_user_delete', methods: ['DELETE'])]
-    public function delete(int $id, UserRepository $repository, EntityManagerInterface $entityManager): Response
+    public function delete(int $id, UserRepository $repository, EntityManagerInterface $entityManager): JsonResponse
     {
         $user = $repository->find($id);
 
