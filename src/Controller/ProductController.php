@@ -98,7 +98,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/{id}/ship', name: 'app_product_ship', methods: ['PUT'])]
-    public function ship(Request $request, int $id, ProductRepository $repository,  EntityManagerInterface $entityManager): JsonResponse
+    public function ship(int $id, ProductRepository $repository,  EntityManagerInterface $entityManager): JsonResponse
     {
         $product = $repository->find($id);
 

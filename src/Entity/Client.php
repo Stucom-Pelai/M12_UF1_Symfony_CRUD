@@ -21,7 +21,7 @@ class Client
     /**
      * @var Collection<int, Shop>
      */
-    #[ORM\ManyToMany(targetEntity: Shop::class, mappedBy: 'clients')]
+    #[ORM\ManyToMany(targetEntity: Shop::class)]
     private Collection $shops;
 
     public function __construct()
