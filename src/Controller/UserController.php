@@ -121,4 +121,13 @@ class UserController extends AbstractController
     {
         return $this->json($userRepository->findByEmail($email), Response::HTTP_OK);
     }
+
+     /**
+     * Get users by email domain
+     */
+    #[Route('/domain/{email}', name: 'app_user_index_domain', methods: ['GET'])]
+    public function indexByEmail(string $email, UserRepository $userRepository): JsonResponse
+    {
+        return $this->json($userRepository->findByEmailDomain($email), Response::HTTP_OK);
+    }
 }

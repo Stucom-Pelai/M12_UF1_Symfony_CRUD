@@ -17,16 +17,32 @@ class UserRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return User[] Returns an array of User objects by email
+     * @return User Returns an Use object by email
      */
-    public function findByEmail($value): array
+    public function findByEmail($value): ?User
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.email = :val')
             ->setParameter('val', $value)
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult()
+            ;
     }
+
+       /**
+        * @return User[] Returns an array of User objects
+        */
+       public function findByEmailDomain($value): array
+       {
+           return $this->createQueryBuilder('u')
+               ->andWhere('u.email like :val')
+               ->setParameter('val', '%' . $value)
+               ->orderBy('u.id', 'ASC')
+               ->setMaxResults(10)
+               ->getQuery()
+               ->getResult()
+           ;
+       }
 
     //    /**
     //     * @return User[] Returns an array of User objects
